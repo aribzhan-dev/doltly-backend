@@ -2,14 +2,21 @@ from pydantic import BaseModel, EmailStr, Field
 
 
 class UserBase(BaseModel):
-    name: str = Field(... ,max_length=50, min_length=1)
-    surname: str | None = Field(None, max_length=50)
+    name: str = Field(
+        ...,
+        min_length=1,
+        max_length=50,
+    )
+    surname: str | None = Field(
+        None,
+        min_length=1,
+        max_length=50
+    )
     email: EmailStr = Field(
         ...,
         max_length=100,
-        pattern=r"^[\w.%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     )
-    point: int = Field(..., description="Point")
+    points: int = Field(0, description="User's current point balance")
 
 
 class UserCreate(UserBase):
