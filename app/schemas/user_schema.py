@@ -9,6 +9,7 @@ class UserBase(BaseModel):
         max_length=100,
         pattern=r"^[\w.%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     )
+    point: int = Field(..., description="Point")
 
 
 class UserCreate(UserBase):
