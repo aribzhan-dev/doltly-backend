@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 from typing import List
-from sqlalchemy import String, Enum as SqlEnum
+from sqlalchemy import String, Enum as SqlEnum, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base
 from app.models.association_table import user_task_association
@@ -14,7 +14,7 @@ class TaskStatus(str, Enum):
 class Task(Base):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     task_desc: Mapped[str] = mapped_column(String(500))
-    deadline: Mapped[datetime] = mapped_column(nullable=False, timezone=True)
+    deadline: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     status: Mapped[TaskStatus] = mapped_column(
         SqlEnum(TaskStatus),
         default=TaskStatus.not_started,
