@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.task_schema import TaskCreate, Task
 from app.services.task_service import create_task
-from app.database.db import get_session
+from app.core.db import get_session
 
 
 
