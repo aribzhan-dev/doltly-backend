@@ -33,8 +33,7 @@ async def create_task(session: AsyncSession, data: TaskCreate):
 async def get_tasks(session: AsyncSession) -> list[Task]:
     stmt = select(Task).order_by(Task.id)
     result = await session.execute(stmt)
-    tasks = result.scalars().all()
-    return list(tasks)
+    return result.scalars().all()
 
 
 async def get_task_by_id(session: AsyncSession, task_id: int) -> Task:
@@ -45,19 +44,18 @@ async def get_task_by_id(session: AsyncSession, task_id: int) -> Task:
         raise ValueError("Task not found")
     return task
 
-async def get_task_by_title(session: AsyncSession, title: str) -> Task:
+async def get_task_by_title(session: AsyncSession, title: str) -> list[Task]:
     stmt = select(Task).where(Task.title == title)
     result = await session.execute(stmt)
-    task = result.scalars().all()
+    return result.scalars().all()
 
 
-async def get_task_by_deadline(session: AsyncSession, deadline: datetime) -> Task:
+
+
+async def get_task_by_deadline(session: AsyncSession, deadline: datetime):
     stmt = select(Task).where(Task.deadline == deadline)
     result = await session.execute(stmt)
-    task = result.scalars().one_or_none()
-    if not task:
-        raise ValueError("Task not found")
-    return task
+    return result.scalars().all()
 
 
 
