@@ -20,7 +20,7 @@ class Task(Base):
         default=TaskStatus.not_started,
         nullable=False
     )
-
+    point: Mapped[int] = mapped_column(default=0, nullable=False)
     users: Mapped[List["User"]] = relationship(
         secondary=user_task_association,
         back_populates="tasks"
