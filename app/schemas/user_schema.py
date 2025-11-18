@@ -16,7 +16,6 @@ class UserBase(BaseModel):
         ...,
         max_length=100,
     )
-    points: int = Field(0, description="User's current point balance")
 
 
 class UserCreate(UserBase):
