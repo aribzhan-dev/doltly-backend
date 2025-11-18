@@ -27,6 +27,15 @@ class UserCreate(UserBase):
         description="Password must contain uppercase, lowercase, digit and special character",
     )
 
+
+class UserUpdate(BaseModel):
+    name: str | None = None
+    surname: str | None = None
+    email: EmailStr | None = None
+    password: str | None = None
+
+
+
 class User(UserBase):
     id: int
     model_config = {"from_attributes": True}
