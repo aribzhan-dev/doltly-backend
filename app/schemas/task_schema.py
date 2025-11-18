@@ -28,21 +28,8 @@ class TaskBase(BaseModel):
 
 
 
-class TaskUpdate(BaseModel):
-    title: str | None = None
-    task_desc: str | None = None
-    deadline: datetime | None = None
-    point: int | None = None
-    status: TaskStatus | None = None
-    user_ids: list[int] | None = None
-
-    @field_validator("deadline")
-    def validate_deadline(cls, value):
-        if value.tzinfo is None:
-            value = value.replace(tzinfo=KZ_TZ)
-        if value < datetime.now(KZ_TZ):
-            raise ValueError("Deadline must be a future date")
-        return value
+class TaskStatusUpdate(BaseModel):
+    status: TaskStatus
 
 
 
