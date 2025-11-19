@@ -34,6 +34,15 @@ class UserUpdate(BaseModel):
     email: EmailStr | None = None
     password: str | None = None
 
+class LoginSchema(BaseModel):
+    email: EmailStr = Field(
+        ...,
+        max_length=50
+    )
+    password: str = Field(
+        min_length=8,
+        max_length=50
+    )
 
 
 class User(UserBase):
