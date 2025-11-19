@@ -39,24 +39,6 @@ async def create_user(session: AsyncSession, data: UserCreate):
     return user
 
 
-async def login_user(session: AsyncSession, email: str, password: str):
-    stmt = select(User).where(User.email == email)
-    result = await session.execute(stmt)
-    user = result.scalars().one_or_none()
-
-    if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="User not found"
-        )
-
-    if not bcrypt.checkpw(password.encode("utf-8"), user.password.encode("utf-8")):
-        raise HTTPException(
-            status_code=400,
-            detail="Incorrect password"
-        )
-
-    return user
 
 async def get_user(session: AsyncSession):
     stmt = select(User).order_by(User.id)

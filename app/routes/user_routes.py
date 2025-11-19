@@ -53,11 +53,5 @@ async def update_user(
 
 
 
-@router.post("/login", response_model=User, status_code=status.HTTP_200_OK)
-async def login_user_route(
-        payload: LoginSchema,
-        session: AsyncSession = Depends(get_session),
-):
-    return await login_user_service(session, payload.email, payload.password)
 
 
