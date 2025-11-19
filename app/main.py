@@ -1,12 +1,15 @@
 from fastapi import FastAPI
 from app.routes.task_routes import router as task_routes
 from app.routes.user_routes import router as user_routes
+from app.routes.auth_routes import router as auth_routes
 import uvicorn
 
 
 app = FastAPI()
 app.include_router(task_routes)
 app.include_router(user_routes)
+app.include_router(auth_routes)
+
 
 @app.get("/")
 async def root():
