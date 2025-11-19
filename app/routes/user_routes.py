@@ -10,9 +10,9 @@ from app.services.user_service import (
     get_user_by_email as get_user_by_email_service,
     create_user as create_user_service,
     get_user_by_id as get_user_by_id_service,
-    login_user as login_user_service,
     update_user as update_user_service,
 )
+from app.services.auth_service import login_user as login_user_service
 from app.core.db import get_session
 
 

@@ -5,6 +5,7 @@ from app.models.user_model import User
 from app.schemas.task_schema import TaskCreate, TaskStatusUpdate, TaskStatus
 from datetime import datetime
 from fastapi import HTTPException
+from sqlalchemy.orm import selectinload
 
 async def create_task(session: AsyncSession, data: TaskCreate):
     stmt = select(User).where(User.id.in_(data.user_ids))
@@ -12,7 +13,8 @@ async def create_task(session: AsyncSession, data: TaskCreate):
     users = result.scalars().all()
 
     if len(users) != len(data.user_ids):
-        raise HTTPException(status_code=400, detail="Some user IDs not found")
+        raise HTTPException(400, "Some user IDs not found")
+
 
     task = Task(
         title=data.title,
@@ -20,25 +22,34 @@ async def create_task(session: AsyncSession, data: TaskCreate):
         deadline=data.deadline,
         point=data.point
     )
-
     task.users = users
 
     session.add(task)
     await session.commit()
     await session.refresh(task)
 
-    return task
+    stmt = (
+        select(Task)
+        .options(selectinload(Task.users))
+        .where(Task.id == task.id)
+    )
+    result = await session.execute(stmt)
+    return result.scalars().one()
 
 
 
 async def get_tasks(session: AsyncSession) -> list[Task]:
-    stmt = select(Task).order_by(Task.id)
+    stmt = select(Task).options(selectinload(Task.users)).order_by(Task.id)
     result = await session.execute(stmt)
     return result.scalars().all()
 
 
 async def get_task_by_id(session: AsyncSession, task_id: int) -> Task:
-    stmt = select(Task).where(Task.id == task_id)
+    stmt = (
+        select(Task)
+        .options(selectinload(Task.users))
+        .where(Task.id == task_id)
+    )
     result = await session.execute(stmt)
     task = result.scalars().one_or_none()
     if not task:
@@ -46,7 +57,11 @@ async def get_task_by_id(session: AsyncSession, task_id: int) -> Task:
     return task
 
 async def get_task_by_title(session: AsyncSession, title: str) -> list[Task]:
-    stmt = select(Task).where(Task.title == title)
+    stmt = (
+        select(Task)
+        .options(selectinload(Task.users))
+        .where(Task.title == title)
+    )
     result = await session.execute(stmt)
     return result.scalars().all()
 
@@ -54,13 +69,17 @@ async def get_task_by_title(session: AsyncSession, title: str) -> list[Task]:
 
 
 async def get_task_by_deadline(session: AsyncSession, deadline: datetime):
-    stmt = select(Task).where(func.date(Task.deadline) == deadline.date())
+    stmt = (
+        select(Task)
+        .options(selectinload(Task.users))
+        .where(func.date(Task.deadline) == deadline.date())
+    )
     result = await session.execute(stmt)
     return result.scalars().all()
 
 
 async def update_task_status(session: AsyncSession, task_id: int, new_status: TaskStatus):
-    stmt = select(Task).where(Task.id == task_id)
+    stmt = select(Task).options(selectinload(Task.users)).where(Task.id == task_id)
     result = await session.execute(stmt)
     task = result.scalars().one_or_none()
 

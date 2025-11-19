@@ -4,6 +4,8 @@ from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 from app.models.task_model import TaskStatus
 from app.models.user_model import User
+from app.schemas.user_schema import UserShort
+
 
 KZ_TZ=ZoneInfo("Asia/Almaty")
 
@@ -46,6 +48,6 @@ class TaskCreate(TaskBase):
 class Task(TaskBase):
     id: int
     status: TaskStatus
-    users: list[int] = Field(default_factory=list)
+    users: list[UserShort]
     model_config = {"from_attributes": True}
 

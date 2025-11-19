@@ -23,7 +23,6 @@ class UserCreate(UserBase):
         ...,
         min_length=8,
         max_length=50,
-        pattern=r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{8,}$",
         description="Password must contain uppercase, lowercase, digit and special character",
     )
 
@@ -43,6 +42,14 @@ class LoginSchema(BaseModel):
         min_length=8,
         max_length=50
     )
+
+class UserShort(BaseModel):
+    id: int
+    name: str
+    surname: str
+
+    model_config = {"from_attributes": True}
+
 
 
 class User(UserBase):
