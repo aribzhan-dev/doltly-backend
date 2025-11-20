@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.task_schema import TaskCreate, Task, TaskStatus
+from app.core.auth_deps import get_current_user
+from app.schemas.task_schema import TaskCreate, Task, TaskStatus, TaskStatusUpdate
 from app.services.task_service import (
     create_task as create_task_service,
     get_tasks as get_tasks_service,
@@ -17,6 +18,7 @@ router = APIRouter(prefix="/tasks", tags=["Tasks"])
 async def create_task(
         payload: TaskCreate,
         session: AsyncSession = Depends(get_session),
+        current_user: int = Depends(get_current_user)
 ):
     return await create_task_service(session, payload)
 
@@ -24,6 +26,7 @@ async def create_task(
 @router.get("/", response_model=list[Task], status_code=status.HTTP_200_OK)
 async def get_tasks(
         session: AsyncSession = Depends(get_session),
+        current_user: int = Depends(get_current_user)
 ):
     return await get_tasks_service(session)
 
@@ -32,6 +35,7 @@ async def get_tasks(
 async def get_task_by_id(
         task_id: int,
         session: AsyncSession = Depends(get_session),
+        current_user: int = Depends(get_current_user)
 ):
     return await get_task_by_id_service(session, task_id)
 
@@ -39,7 +43,8 @@ async def get_task_by_id(
 @router.put("/{task_id}", response_model=Task)
 async def update_task_status_route(
         task_id: int,
-        task_status: TaskStatus,
+        payload: TaskStatusUpdate,
         session: AsyncSession = Depends(get_session),
+        current_user: int = Depends(get_current_user)
 ):
-    return await update_task_status_service(session, task_id, task_status)
+    return await update_task_status_service(session, task_id, payload.task_status)

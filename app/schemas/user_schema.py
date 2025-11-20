@@ -30,7 +30,6 @@ class UserCreate(UserBase):
 class UserUpdate(BaseModel):
     name: str | None = None
     surname: str | None = None
-    email: EmailStr | None = None
     password: str | None = None
 
 class LoginSchema(BaseModel):

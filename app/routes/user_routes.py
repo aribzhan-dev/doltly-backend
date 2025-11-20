@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, FastAPI
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
-
+from app.core.auth_deps import get_current_user
 from app.schemas.user_schema import UserCreate, UserUpdate, User, UserBase, LoginSchema
 from app.services.user_service import (
     get_user as get_user_service,
@@ -31,6 +31,7 @@ async def create_user_route(
 @router.get("/", response_model=List[User], status_code=status.HTTP_200_OK)
 async def get_users_routes(
         session: AsyncSession = Depends(get_session),
+        current_user: int = Depends(get_current_user)
 ):
     return await get_user_service(session)
 
@@ -39,6 +40,7 @@ async def get_users_routes(
 async def get_user(
         user_id: int,
         session: AsyncSession = Depends(get_session),
+        current_user: int = Depends(get_current_user)
 ):
     return await get_user_by_id_service(session, user_id)
 
@@ -48,6 +50,7 @@ async def update_user(
         user_id: int,
         payload: UserUpdate,
         session: AsyncSession = Depends(get_session),
+        current_user: int = Depends(get_current_user)
 ):
     return await update_user_service(session, user_id, payload)
 

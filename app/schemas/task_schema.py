@@ -31,7 +31,7 @@ class TaskBase(BaseModel):
 
 
 class TaskStatusUpdate(BaseModel):
-    status: TaskStatus
+    task_status: TaskStatus
 
 
 
