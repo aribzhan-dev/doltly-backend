@@ -1,14 +1,11 @@
-from dotenv import load_dotenv
 from pydantic import BaseModel, Field, field_validator
-from datetime import datetime, timezone
-from zoneinfo import ZoneInfo
-from app.models.task_model import TaskStatus
-from app.models.user_model import User
 from app.schemas.user_schema import UserShort
+from app.models.task_model import TaskStatus
+from zoneinfo import ZoneInfo
+from datetime import datetime
 
 
-KZ_TZ=ZoneInfo("Asia/Almaty")
-
+KZ_TZ = ZoneInfo("Asia/Almaty")
 
 
 class TaskBase(BaseModel):
@@ -29,10 +26,8 @@ class TaskBase(BaseModel):
     user_ids: list[int] = Field(default_factory=list, description="List of user ids")
 
 
-
 class TaskStatusUpdate(BaseModel):
     task_status: TaskStatus
-
 
 
 class TaskCreate(TaskBase):
@@ -50,4 +45,3 @@ class Task(TaskBase):
     status: TaskStatus
     users: list[UserShort]
     model_config = {"from_attributes": True}
-
