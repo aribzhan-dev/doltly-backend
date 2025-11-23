@@ -32,7 +32,15 @@ async def create_user(session: AsyncSession, data: UserCreate):
     session.add(user)
     await session.commit()
     await session.refresh(user)
-    return user
+
+    access = create_access_token({"user_id": user.id})
+    refresh = create_refresh_token({"user_id": user.id})
+
+    return {
+        "access_token": access,
+        "refresh_token": refresh,
+        "token_type": "Bearer"
+    }
 
 
 async def login_user(session: AsyncSession, email: str, password: str):

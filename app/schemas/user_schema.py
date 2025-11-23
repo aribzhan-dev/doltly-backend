@@ -50,6 +50,12 @@ class UserShort(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class TokenResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str
+
+
 
 class User(UserBase):
     id: int

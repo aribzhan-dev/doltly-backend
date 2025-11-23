@@ -1,17 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.user_schema import LoginSchema
 from app.services.auth_service import login_user
 from app.core.auth_utils import decode_refresh_token, create_access_token, create_refresh_token
 from app.core.db import get_session
-from app.schemas.user_schema import UserCreate, User
+from app.schemas.user_schema import UserCreate, LoginSchema, TokenResponse
 from app.services.auth_service import create_user as create_user_service
 from starlette import status
 
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
-@router.post("/register", response_model=User, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 async def create_user_route(
         payload: UserCreate,
         session: AsyncSession = Depends(get_session),
