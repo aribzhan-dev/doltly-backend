@@ -10,6 +10,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(120), unique=True, index=True, nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     points: Mapped[int] = mapped_column(Integer, default=0)
+    fcm_token : Mapped[str] = mapped_column(String(150), nullable=True)
 
     tasks: Mapped[List["Task"]] = relationship(
         secondary=user_task_association,
