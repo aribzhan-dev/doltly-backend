@@ -8,7 +8,9 @@ import bcrypt
 
 
 async def create_user(session: AsyncSession, data: UserCreate):
-    stmt = select(User).where(User.email == data.email)
+    stmt = select(User).where(User.nickname == data.nickname)
+    if (await session.execute(stmt)).scalar_one_or_none():
+        raise HTTPException(400, "Nickname already exists")
     result = await session.execute(stmt)
     existing_user = result.scalars().one_or_none()
 
@@ -23,6 +25,7 @@ async def create_user(session: AsyncSession, data: UserCreate):
     hashed_password = bcrypt.hashpw(byte_pass, salt).decode("utf-8")
 
     user = User(
+        nickname=data.nickname,
         name=data.name,
         surname=data.surname,
         email=data.email,

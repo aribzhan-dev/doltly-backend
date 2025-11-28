@@ -5,6 +5,7 @@ from app.models.base import Base
 from app.models.association_table import user_task_association
 
 class User(Base):
+    nickname: Mapped[str] = mapped_column(String(150), nullable=False, unique=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     surname: Mapped[str] = mapped_column(String(100), nullable=False)
     email: Mapped[str] = mapped_column(String(120), unique=True, index=True, nullable=False)

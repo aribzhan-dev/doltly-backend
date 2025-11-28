@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from app.models.user_model import User
 from fastapi import HTTPException
-from app.schemas.user_schema import User as UserSchema, UserCreate, UserBase, UserUpdate
+from app.schemas.user_schema import UserUpdate
 import bcrypt
 
 
@@ -34,8 +34,19 @@ async def update_user(session: AsyncSession, user_id: int, data:UserUpdate):
     if not existing_user:
         raise HTTPException(404, detail="User not found")
 
-    if data.email:
-        raise HTTPException(400, "Email cannot be updated")
+
+    if data.nickname:
+        nickname_q = select(User).where(
+            User.nickname == data.nickname,
+            User.id != user_id
+        )
+        existing = (await session.execute(nickname_q)).scalar_one_or_none()
+        if existing:
+            raise HTTPException(400, "Nickname already exists")
+
+        existing_user.nickname = data.nickname
+
+
 
     if data.password:
         byte_pass = data.password.encode("utf-8")

@@ -2,6 +2,11 @@ from pydantic import BaseModel, EmailStr, Field
 
 
 class UserBase(BaseModel):
+    nickname: str = Field(
+        ...,
+        min_length=1,
+        max_length=50
+    )
     name: str = Field(
         ...,
         min_length=1,
@@ -12,6 +17,7 @@ class UserBase(BaseModel):
         min_length=1,
         max_length=50
     )
+    points: int
     email: EmailStr = Field(
         ...,
         max_length=100,
@@ -28,6 +34,7 @@ class UserCreate(UserBase):
 
 
 class UserUpdate(BaseModel):
+    nickname: str | None = None
     name: str | None = None
     surname: str | None = None
     password: str | None = None
@@ -44,6 +51,7 @@ class LoginSchema(BaseModel):
 
 class UserShort(BaseModel):
     id: int
+    nickname: str
     name: str
     surname: str
 

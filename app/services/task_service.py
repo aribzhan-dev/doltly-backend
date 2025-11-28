@@ -16,7 +16,7 @@ async def get_tasks(session: AsyncSession, type: str | None, user_id: int):
     if type == "me":
         stmt = stmt.where(Task.users.any(User.id == user_id))
 
-    stmt = stmt.order_by(Task.id)
+    stmt = stmt.order_by(Task.id.desc())
     result = await session.execute(stmt)
     return result.scalars().all()
 
