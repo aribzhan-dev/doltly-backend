@@ -6,9 +6,9 @@ import uvicorn
 
 
 app = FastAPI()
-app.include_router(task_routes, prefix="/api")
-app.include_router(user_routes, prefix="/api")
 app.include_router(auth_routes, prefix="/api")
+app.include_router(user_routes, prefix="/api")
+app.include_router(task_routes, prefix="/api")
 
 
 @app.get("api/")
