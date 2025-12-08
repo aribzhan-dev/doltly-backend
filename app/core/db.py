@@ -1,6 +1,6 @@
-import os
-from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from dotenv import load_dotenv
+import os
 from app.models.base import Base
 
 

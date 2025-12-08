@@ -18,5 +18,11 @@ class User(Base):
         back_populates="users"
     )
 
+    companies = relationship(
+        "Company",
+        secondary="company_employers",
+        back_populates="employees"
+    )
+
     def __repr__(self):
         return f"<User {self.name} {self.surname}>"
