@@ -1,10 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.core.company_deps import is_company_owner
 
+from app.core.company_deps import is_company_owner
 from app.core.db import get_session
 from app.core.auth_deps import get_current_user
-from app.schemas.company_schema import CompanyCreate, CompanyLogin, AddEmployeeRequest, CompanyOut
+
+from app.schemas.company_schema import (
+    CompanyCreate,
+    CompanyLogin,
+    AddEmployeeRequest,
+    CompanyOut
+)
+
 from app.services.company_service import (
     create_company,
     company_login,
@@ -42,18 +49,10 @@ async def add_employee_route(
     company_id: int,
     request: AddEmployeeRequest,
     session: AsyncSession = Depends(get_session),
-    current_user: int = Depends(get_current_user)
+    current_user: int = Depends(get_current_user),
+    company = Depends(is_company_owner)
 ):
     return await add_employee_to_company(session, company_id, request.user_nick)
-
-
-@router.post("/join/{invite_code}")
-async def join_company(
-        invite_code: str,
-        session: AsyncSession = Depends(get_session),
-        current_user: int = Depends(get_current_user)
-):
-    return await join_company_by_invite(session, invite_code, current_user)
 
 
 
@@ -76,3 +75,10 @@ async def get_my_companies(
 
 
 
+@router.post("/join/{invite_code}")
+async def join_company(
+        invite_code: str,
+        session: AsyncSession = Depends(get_session),
+        current_user: int = Depends(get_current_user)
+):
+    return await join_company_by_invite(session, invite_code, current_user)

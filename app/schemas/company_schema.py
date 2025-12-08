@@ -33,4 +33,4 @@ class CompanyOut(BaseModel):
 
 
 class AddEmployeeRequest(BaseModel):
-    user_id: int
+    user_nick: str
