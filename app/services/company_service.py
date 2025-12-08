@@ -111,3 +111,30 @@ async def get_user_companies(session: AsyncSession, user_id: int):
         raise HTTPException(404, "User not found")
 
     return user.companies
+
+
+
+async def join_company_by_invite(session: AsyncSession, invite_code: str, user_id: int):
+    stmt = select(Company).where(Company.invite_code == invite_code)
+    result = await session.execute(stmt)
+    company = result.scalar_one_or_none()
+
+    if not company:
+        raise HTTPException(404, "Invalid invite code")
+
+    stmt = select(User).where(User.id == user_id)
+    res = await session.execute(stmt)
+    user = res.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(404, "User not found")
+
+    if user in company.employees:
+        raise HTTPException(400, "User already joined this company")
+
+    company.employees.append(user)
+
+    await session.commit()
+    await session.refresh(company)
+
+    return {"message": "Successfully joined", "company_id": company.id}
