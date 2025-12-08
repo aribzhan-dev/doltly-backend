@@ -13,6 +13,7 @@ class Company(Base):
     name = Column(String(150), nullable=False)
     login = Column(String(150), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
+    invite_code = Column(String(20), unique=True)
 
     owner_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"))
     owner = relationship("User")

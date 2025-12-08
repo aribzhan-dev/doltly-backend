@@ -7,6 +7,7 @@ class CompanyCreate(BaseModel):
     password: str = Field(..., max_length=100, min_length=2, description="Company password")
 
 
+
 class CompanyLogin(BaseModel):
     login: str = Field(..., max_length=100, min_length=2, description="Company login")
     password: str = Field(..., max_length=100, min_length=2, description="Company password")

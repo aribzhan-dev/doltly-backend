@@ -10,13 +10,14 @@ from datetime import datetime
 
 
 
-async def get_tasks(session: AsyncSession, type: str | None, user_id: int):
+async def get_tasks(session: AsyncSession, company_id: int | None, user_id: int):
     stmt = select(Task).options(selectinload(Task.users))
 
-    if type == "me":
-        stmt = stmt.where(Task.users.any(User.id == user_id))
+    if company_id:
+        stmt = stmt.where(Task.company_id == company_id)
 
     stmt = stmt.order_by(Task.id.desc())
+
     result = await session.execute(stmt)
     return result.scalars().all()
 

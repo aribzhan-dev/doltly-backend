@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from fastapi import HTTPException
 import bcrypt
-
+import secrets
 from app.models.company_model import Company, company_employers
 from app.models.user_model import User
 from app.schemas.company_schema import CompanyCreate, CompanyLogin
@@ -19,11 +19,13 @@ async def create_company(session: AsyncSession, owner_id: int, data: CompanyCrea
         raise HTTPException(400, "Login already exists.")
 
     hashed_pw = bcrypt.hashpw(data.password.encode(), bcrypt.gensalt()).decode()
+    invite_code = secrets.token_hex(4)
 
     company = Company(
         name=data.name,
         login=data.login.lower(),
         password=hashed_pw,
+        invite_code=invite_code,
         owner_id=owner_id
     )
 

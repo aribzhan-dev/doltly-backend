@@ -16,10 +16,11 @@ router = APIRouter(prefix="/tasks", tags=["Tasks"])
 @router.get("/", response_model=list[Task])
 async def get_tasks_route(
         type: str | None = None,
+        company_id: int | None = None,
         session: AsyncSession = Depends(get_session),
         current_user: int = Depends(get_current_user)
 ):
-    return await get_tasks_service(session, type, current_user)
+    return await get_tasks_service(session, company_id, current_user)
 
 
 @router.get("/{task_id}", response_model=Task)
