@@ -47,6 +47,15 @@ async def add_employee_route(
     return await add_employee_to_company(session, company_id, request.user_nick)
 
 
+@router.post("/join/{invite_code}")
+async def join_company(
+        invite_code: str,
+        session: AsyncSession = Depends(get_session),
+        current_user: int = Depends(get_current_user)
+):
+    return await join_company_by_invite(session, invite_code, current_user)
+
+
 
 @router.get("/{company_id}/employees")
 async def get_employees_route(
@@ -66,21 +75,4 @@ async def get_my_companies(
     return await get_user_companies(session, current_user)
 
 
-@router.post("/{company_id}/add-employee")
-async def add_employee_route(
-    company_id: int,
-    request: AddEmployeeRequest,
-    session: AsyncSession = Depends(get_session),
-    current_user: int = Depends(get_current_user),
-    company = Depends(is_company_owner)
-):
-    return await add_employee_to_company(session, company_id, request.user_nick)
 
-
-@router.post("/join/{invite_code}")
-async def join_company(
-        invite_code: str,
-        session: AsyncSession = Depends(get_session),
-        current_user: int = Depends(get_current_user)
-):
-    return await join_company_by_invite(session, invite_code, current_user)
