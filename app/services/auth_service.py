@@ -25,7 +25,7 @@ async def create_user(session: AsyncSession, data: UserCreate):
     hashed_password = bcrypt.hashpw(byte_pass, salt).decode("utf-8")
 
     user = User(
-        nickname=data.nickname,
+        nickname=data.nickname.lower(),
         name=data.name,
         surname=data.surname,
         email=data.email,
