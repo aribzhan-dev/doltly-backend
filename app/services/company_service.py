@@ -138,3 +138,26 @@ async def join_company_by_invite(session: AsyncSession, invite_code: str, user_i
     await session.refresh(company)
 
     return {"message": "Successfully joined", "company_id": company.id}
+
+async def promote_to_owner(session: AsyncSession, company_id: int, user_id: int, current_user: int):
+    company = await get_company_by_id(session, company_id)
+
+    if current_user != company.owner_id:
+        raise HTTPException(403, "Only owner can promote another user")
+
+    stmt = select(User).where(User.id == user_id)
+    result = await session.execute(stmt)
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(404, "User not found")
+
+    await session.execute(
+        company_employers.update()
+        .where(company_employers.c.company_id == company_id)
+        .where(company_employers.c.user_id == user_id)
+        .values(role="owner")
+    )
+
+    await session.commit()
+    return {"message": "User promoted to owner"}

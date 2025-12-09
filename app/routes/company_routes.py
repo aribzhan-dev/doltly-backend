@@ -20,6 +20,7 @@ from app.services.company_service import (
     get_company_employees,
     get_user_companies,
     join_company_by_invite,
+    promote_to_owner,
 )
 
 router = APIRouter(prefix="/company", tags=["Company"])
@@ -82,3 +83,13 @@ async def join_company(
         current_user: int = Depends(get_current_user)
 ):
     return await join_company_by_invite(session, invite_code, current_user)
+
+
+@router.post("/{company_id}/promote/{user_id}")
+async def promote_employee_to_owner(
+    company_id: int,
+    user_id: int,
+    session: AsyncSession = Depends(get_session),
+    current_user: int = Depends(get_current_user)
+):
+    return await promote_to_owner(session, company_id, user_id, current_user)
