@@ -11,11 +11,8 @@ from app.schemas.company_schema import CompanyCreate, CompanyLogin
 from app.core.auth_utils import create_access_token, create_refresh_token
 
 
-# ------------------------------------------------------------------------------
-# CREATE COMPANY
-# ------------------------------------------------------------------------------
+
 async def create_company(session: AsyncSession, owner_id: int, data: CompanyCreate):
-    # Login unikal bo‘lishi shart
     stmt = select(Company).where(Company.login == data.login.lower())
     result = await session.execute(stmt)
     existing = result.scalar_one_or_none()
@@ -42,10 +39,10 @@ async def create_company(session: AsyncSession, owner_id: int, data: CompanyCrea
 
 
 
-async def get_company_by_id(session: AsyncSession, company_id: int):
+async def get_company_by_name(session: AsyncSession, comp_name: str):
     stmt = (
         select(Company)
-        .where(Company.id == company_id)
+        .where(Company.name == comp_name)
         .options(selectinload(Company.employees))
     )
 
@@ -116,7 +113,7 @@ async def get_user_companies(session: AsyncSession, user_id: int):
     stmt = (
         select(User)
         .where(User.id == user_id)
-        .options(selectinload(User.companies))
+        .options(selectinload(User.companies).selectinload(Company.employees))
     )
     result = await session.execute(stmt)
     user = result.scalar_one_or_none()

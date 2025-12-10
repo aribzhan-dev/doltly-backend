@@ -20,7 +20,8 @@ class User(Base):
     companies = relationship(
         "Company",
         secondary="company_employers",
-        back_populates="employees"
+        back_populates="employees",
+        lazy="selectin"
     )
     def __repr__(self):
         return f"<User {self.name} {self.surname}>"

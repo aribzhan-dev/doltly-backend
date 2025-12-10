@@ -28,9 +28,10 @@ class Company(Base):
     employees = relationship(
         "User",
         secondary=company_employers,
-        back_populates="companies"
+        back_populates="companies",
+        lazy="selectin"
     )
-    tasks = relationship("Task", back_populates="company")
+    tasks = relationship("Task", back_populates="company", lazy="selectin")
 
     def __repr__(self) -> str:
         return f"Company {self.name}"

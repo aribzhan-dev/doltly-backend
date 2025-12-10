@@ -58,13 +58,13 @@ async def add_employee_route(
 
 
 
-@router.get("/{company_id}/employees")
+@router.get("/{comp_name}/employees")
 async def get_employees_route(
-    company_id: int,
+    comp_name: str,
     session: AsyncSession = Depends(get_session),
     current_user: int = Depends(get_current_user)
 ):
-    return await get_company_employees(session, company_id)
+    return await get_company_employees(session, comp_name)
 
 
 
