@@ -31,7 +31,7 @@ class Task(Base):
     )
     company_id: Mapped[int | None] = mapped_column(
         Integer,
-        ForeignKey("company.id", ondelete="SET NULL"),
+        ForeignKey("companies.id", ondelete="SET NULL"),
         nullable=True
     )
     company = relationship("Company", back_populates="tasks")

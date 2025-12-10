@@ -10,7 +10,7 @@ class CompanyRole(str, enum.Enum):
 company_employers = Table(
     "company_employers",
     Base.metadata,
-    Column("company_id", Integer, ForeignKey("company.id", ondelete="CASCADE"), primary_key=True),
+    Column("company_id", Integer, ForeignKey("companies.id", ondelete="CASCADE"), primary_key=True),
     Column("user_id", Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True),
     Column("role", Enum(CompanyRole), nullable=False, default=CompanyRole.employee)
 )
@@ -27,3 +27,7 @@ class Company(Base):
         secondary=company_employers,
         back_populates="companies"
     )
+    tasks = relationship("Task", back_populates="company")
+
+    def __repr__(self) -> str:
+        return f"Company {self.name}"
