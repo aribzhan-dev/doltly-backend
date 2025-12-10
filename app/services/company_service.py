@@ -1,17 +1,22 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from fastapi import HTTPException
 import bcrypt
 import secrets
+
 from app.models.company_model import Company, company_employers
 from app.models.user_model import User
 from app.schemas.company_schema import CompanyCreate, CompanyLogin
 from app.core.auth_utils import create_access_token, create_refresh_token
 
 
-
+# ------------------------------------------------------------------------------
+# CREATE COMPANY
+# ------------------------------------------------------------------------------
 async def create_company(session: AsyncSession, owner_id: int, data: CompanyCreate):
-    stmt = select(Company).where(Company.login == data.login)
+    # Login unikal bo‘lishi shart
+    stmt = select(Company).where(Company.login == data.login.lower())
     result = await session.execute(stmt)
     existing = result.scalar_one_or_none()
 
@@ -25,8 +30,8 @@ async def create_company(session: AsyncSession, owner_id: int, data: CompanyCrea
         name=data.name,
         login=data.login.lower(),
         password=hashed_pw,
-        invite_code=invite_code,
-        owner_id=owner_id
+        owner_id=owner_id,
+        invite_code=invite_code
     )
 
     session.add(company)
@@ -38,7 +43,12 @@ async def create_company(session: AsyncSession, owner_id: int, data: CompanyCrea
 
 
 async def get_company_by_id(session: AsyncSession, company_id: int):
-    stmt = select(Company).where(Company.id == company_id)
+    stmt = (
+        select(Company)
+        .where(Company.id == company_id)
+        .options(selectinload(Company.employees))
+    )
+
     result = await session.execute(stmt)
     company = result.scalar_one_or_none()
 
@@ -46,6 +56,7 @@ async def get_company_by_id(session: AsyncSession, company_id: int):
         raise HTTPException(404, "Company not found")
 
     return company
+
 
 
 
@@ -75,24 +86,23 @@ async def company_login(session: AsyncSession, data: CompanyLogin):
 async def add_employee_to_company(session: AsyncSession, company_id: int, user_nick: str):
     company = await get_company_by_id(session, company_id)
 
-
-    stmt = select(User).where(User.nickname == user_nick.lower())
+    stmt = select(User).where(User.nickname.ilike(user_nick))
     result = await session.execute(stmt)
     user = result.scalar_one_or_none()
 
     if not user:
         raise HTTPException(404, "User not found")
 
-
     if user in company.employees:
         raise HTTPException(400, "User already in company")
+
 
     company.employees.append(user)
 
     await session.commit()
     await session.refresh(company)
 
-    return {"message": "Employee added", "company_id": company.id, "user_nick": user.nickname}
+    return {"message": "Employee added successfully", "user_nick": user.nickname}
 
 
 
@@ -103,7 +113,11 @@ async def get_company_employees(session: AsyncSession, company_id: int):
 
 
 async def get_user_companies(session: AsyncSession, user_id: int):
-    stmt = select(User).where(User.id == user_id)
+    stmt = (
+        select(User)
+        .where(User.id == user_id)
+        .options(selectinload(User.companies))
+    )
     result = await session.execute(stmt)
     user = result.scalar_one_or_none()
 
@@ -111,7 +125,6 @@ async def get_user_companies(session: AsyncSession, user_id: int):
         raise HTTPException(404, "User not found")
 
     return user.companies
-
 
 
 async def join_company_by_invite(session: AsyncSession, invite_code: str, user_id: int):
@@ -137,13 +150,16 @@ async def join_company_by_invite(session: AsyncSession, invite_code: str, user_i
     await session.commit()
     await session.refresh(company)
 
-    return {"message": "Successfully joined", "company_id": company.id}
+    return {"message": "Successfully joined company", "company_id": company.id}
+
+
 
 async def promote_to_owner(session: AsyncSession, company_id: int, user_id: int, current_user: int):
     company = await get_company_by_id(session, company_id)
 
     if current_user != company.owner_id:
-        raise HTTPException(403, "Only owner can promote another user")
+        raise HTTPException(403, "Only company owner can promote others")
+
 
     stmt = select(User).where(User.id == user_id)
     result = await session.execute(stmt)
@@ -151,6 +167,7 @@ async def promote_to_owner(session: AsyncSession, company_id: int, user_id: int,
 
     if not user:
         raise HTTPException(404, "User not found")
+
 
     await session.execute(
         company_employers.update()
@@ -160,4 +177,4 @@ async def promote_to_owner(session: AsyncSession, company_id: int, user_id: int,
     )
 
     await session.commit()
-    return {"message": "User promoted to owner"}
+    return {"message": f"User {user.nickname} promoted to owner"}
