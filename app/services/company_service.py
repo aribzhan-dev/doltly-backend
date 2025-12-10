@@ -39,6 +39,22 @@ async def create_company(session: AsyncSession, owner_id: int, data: CompanyCrea
 
 
 
+async def get_company_by_id(session: AsyncSession, company_id: int):
+    stmt = (
+        select(Company)
+        .where(Company.id == company_id)
+        .options(selectinload(Company.employees))
+    )
+
+    result = await session.execute(stmt)
+    company = result.scalar_one_or_none()
+
+    if not company:
+        raise HTTPException(404, "Company not found")
+
+    return company
+
+
 async def get_company_by_name(session: AsyncSession, comp_name: str):
     stmt = (
         select(Company)

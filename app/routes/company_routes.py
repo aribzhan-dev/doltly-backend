@@ -15,11 +15,12 @@ from app.services.company_service import (
     create_company,
     company_login,
     add_employee_to_company,
-    get_company_by_id,
+    get_company_by_name,
     get_company_employees,
     get_user_companies,
     join_company_by_invite,
     promote_to_owner,
+    get_company_by_id,
 )
 
 router = APIRouter(prefix="/company", tags=["Company"])
@@ -57,14 +58,23 @@ async def add_employee_route(
     )
 
 
+@router.get("/id/{company_id}/employees")
+async def get_employees_by_id(
+    company_id: int,
+    session: AsyncSession = Depends(get_session),
+    current_user: int = Depends(get_current_user)
+):
+    return await get_company_employees(session, company_id)
 
-@router.get("/{comp_name}/employees")
-async def get_employees_route(
+
+@router.get("/name/{comp_name}/employees")
+async def get_employees_by_name(
     comp_name: str,
     session: AsyncSession = Depends(get_session),
     current_user: int = Depends(get_current_user)
 ):
-    return await get_company_employees(session, comp_name)
+    company = await get_company_by_name(session, comp_name)
+    return company.employees
 
 
 
