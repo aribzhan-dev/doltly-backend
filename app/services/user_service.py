@@ -47,7 +47,6 @@ async def update_user(session: AsyncSession, user_id: int, data:UserUpdate):
         existing_user.nickname = data.nickname
 
 
-
     if data.password:
         byte_pass = data.password.encode("utf-8")
         salt = bcrypt.gensalt()

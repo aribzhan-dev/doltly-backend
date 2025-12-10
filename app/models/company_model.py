@@ -16,12 +16,15 @@ company_employers = Table(
 )
 
 class Company(Base):
+    __tablename__ = "companies"
+    owner_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"))
+
     name = Column(String(150), nullable=False)
     login = Column(String(150), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
-    owner_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"))
-    owner = relationship("User")
+    invite_code = Column(String(255), nullable=False, unique=True)
 
+    owner = relationship("User")
     employees = relationship(
         "User",
         secondary=company_employers,

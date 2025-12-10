@@ -13,6 +13,12 @@ class TaskStatus(str, Enum):
 
 
 class Task(Base):
+    company_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("companies.id", ondelete="SET NULL"),
+        nullable=True
+    )
+
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     task_desc: Mapped[str | None] = mapped_column(String(500), nullable=True)
     deadline: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
@@ -28,11 +34,6 @@ class Task(Base):
     users: Mapped[List["User"]] = relationship(
         secondary=user_task_association,
         back_populates="tasks"
-    )
-    company_id: Mapped[int | None] = mapped_column(
-        Integer,
-        ForeignKey("companies.id", ondelete="SET NULL"),
-        nullable=True
     )
     company = relationship("Company", back_populates="tasks")
 
