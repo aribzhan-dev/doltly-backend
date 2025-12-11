@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from app.models.task_model import Task
 from app.models.user_model import User
+from app.models.company_model import Company, company_employers
 from sqlalchemy import select, func
 from fastapi import HTTPException
 from datetime import datetime
@@ -10,13 +11,24 @@ from datetime import datetime
 
 
 
-async def get_tasks(session: AsyncSession, company_id: int | None, user_id: int):
-    stmt = select(Task).options(selectinload(Task.users))
+async def get_tasks(session: AsyncSession, user_id: int):
+    stmt = (
+        select(Company)
+        .join(company_employers)
+        .where(company_employers.c.user_id == user_id)
+    )
+    result = await session.execute(stmt)
+    company = result.scalar_one_or_none()
 
-    if company_id:
-        stmt = stmt.where(Task.company_id == company_id)
+    if not company:
+        return []
 
-    stmt = stmt.order_by(Task.id.desc())
+    stmt = (
+        select(Task)
+        .where(Task.company_id == company.id)
+        .order_by(Task.id.desc())
+        .options(selectinload(Task.users))
+    )
 
     result = await session.execute(stmt)
     return result.scalars().all()

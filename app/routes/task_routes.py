@@ -7,7 +7,7 @@ from app.services.task_service import (
 )
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.core.auth_deps import get_current_user
+from app.core.auth_deps import get_current_user, get_current_company
 from app.core.db import get_session
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
@@ -15,12 +15,10 @@ router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
 @router.get("/", response_model=list[Task])
 async def get_tasks_route(
-        type: str | None = None,
-        company_id: int | None = None,
-        session: AsyncSession = Depends(get_session),
-        current_user: int = Depends(get_current_user)
+    session: AsyncSession = Depends(get_session),
+    current_user: int = Depends(get_current_user)
 ):
-    return await get_tasks_service(session, company_id, current_user)
+    return await get_tasks_service(session, current_user)
 
 
 @router.get("/{task_id}", response_model=Task)
@@ -36,9 +34,9 @@ async def get_task_by_id(
 async def create_task(
         payload: TaskCreate,
         session: AsyncSession = Depends(get_session),
-        current_user: int = Depends(get_current_user)
+        company_id: int = Depends(get_current_company)
 ):
-    return await create_task_service(session, payload)
+    return await create_task_service(session, payload, company_id)
 
 
 @router.put("/{task_id}", response_model=Task)

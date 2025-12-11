@@ -118,7 +118,6 @@ async def add_employee_to_company(session: AsyncSession, company_id: int, user_n
     return {"message": "Employee added successfully", "user_nick": user.nickname}
 
 
-
 async def get_company_employees(session: AsyncSession, company_id: int):
     company = await get_company_by_id(session, company_id)
     return company.employees

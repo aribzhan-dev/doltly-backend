@@ -19,9 +19,9 @@ class EmployeeOut(BaseModel):
     nickname: str = Field(..., max_length=100, min_length=2, description="Employee nickname")
     name: str = Field(..., max_length=100, min_length=2, description="User name")
     surname: str = Field(..., max_length=100, min_length=2, description="User surname")
+    points: int = Field(..., ge=0, description="Employee point")
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CompanyOut(BaseModel):
@@ -30,6 +30,7 @@ class CompanyOut(BaseModel):
     login: str = Field(..., max_length=100, min_length=2, description="Company login")
     invite_code: str = Field(..., max_length=100, min_length=2, description="Company invite code")
     owner_id: Optional[int]
+    employees: List[EmployeeOut] = []
 
     model_config = ConfigDict(from_attributes=True)
 

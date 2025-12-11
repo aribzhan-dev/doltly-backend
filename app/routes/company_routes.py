@@ -9,6 +9,7 @@ from app.schemas.company_schema import (
     CompanyLogin,
     AddEmployeeRequest,
     CompanyOut,
+    EmployeeOut
 )
 
 from app.services.company_service import (
@@ -58,7 +59,7 @@ async def add_employee_route(
     )
 
 
-@router.get("/id/{company_id}/employees")
+@router.get("/id/{company_id}/employees", response_model=list[EmployeeOut])
 async def get_employees_by_id(
     company_id: int,
     session: AsyncSession = Depends(get_session),
@@ -67,7 +68,7 @@ async def get_employees_by_id(
     return await get_company_employees(session, company_id)
 
 
-@router.get("/name/{comp_name}/employees")
+@router.get("/name/{comp_name}/employees", response_model=list[EmployeeOut])
 async def get_employees_by_name(
     comp_name: str,
     session: AsyncSession = Depends(get_session),
